@@ -1,0 +1,268 @@
+#include "raylib.h"
+#include <stdint.h>
+
+#include "w_keyboard.h"
+
+#define KEY_COUNT    32
+#define FRAME_WIDTH  14
+#define FRAME_HEIGHT 14
+
+Texture2D tex;
+Rectangle spr[KEY_COUNT * 3] = { 0 };
+
+uint8_t anim_phase[KEY_COUNT] = { 0 };
+float anim_acc[KEY_COUNT] = { 0.0f };
+
+int _get_key_spr_index(int key);
+
+void w_keyboard_init(void)
+{
+    uint8_t i;
+    tex = LoadTexture("assets/keyboard.png");
+
+    for (i = 0; i < KEY_COUNT; ++i) {
+        spr[i] = (Rectangle) {
+            0,
+            FRAME_HEIGHT * i,
+            FRAME_WIDTH,
+            FRAME_HEIGHT
+        };
+        spr[i + KEY_COUNT] = (Rectangle) {
+            FRAME_WIDTH,
+            FRAME_HEIGHT * i,
+            FRAME_WIDTH,
+            FRAME_HEIGHT
+        };
+        spr[i + KEY_COUNT * 2] = (Rectangle) {
+            FRAME_WIDTH * 2,
+            FRAME_HEIGHT * i,
+            FRAME_WIDTH,
+            FRAME_HEIGHT
+        };
+    }
+}
+
+void w_keyboard_update(void)
+{
+    uint8_t i, key_index;
+    int key;
+
+    key = GetCharPressed();
+    if (key > 0) {
+        // TODO: convert key to UTF-8 codepoints and append to "buff" global
+        key_index = _get_key_spr_index(key);
+        if (key_index >= 0) {
+            anim_acc[key_index] = 0.0f;
+            anim_phase[key_index] = 1;
+        }
+    }
+
+    for (i = 0; i < KEY_COUNT; ++i) {
+        if (anim_phase[i] == 2) {
+            anim_phase[i] = 0;
+        } else if (anim_phase[i] > 0) {
+            if (anim_acc[i] > 0.02f / 3) {
+                anim_acc[i] = 0.0f;
+                anim_phase[i]++;
+            } else {
+                anim_acc[i] += GetFrameTime();
+            }
+        }
+    }
+}
+
+void w_keyboard_draw(void)
+{
+    Rectangle dest;
+    uint8_t
+        i
+        , r1 = 12
+        , r2 = 11
+        , r3 = 9
+        , scale = GetScreenWidth() * 0.0055f
+        , spacing_x = 5
+        , spacing_y = 4;
+    uint16_t
+        x
+        , y = 0
+        , rw
+        , offset_y = (GetScreenHeight() / 2) + (FRAME_HEIGHT * scale);
+
+    y = 0;
+    rw = FRAME_WIDTH * r1 * scale + (r1 * spacing_x);
+    for (i = 0; i < r1; ++i) {
+        x = FRAME_WIDTH * i;
+        x = ((GetScreenWidth() - rw) / 2) + (x * scale);
+
+        dest = (Rectangle) {
+            x + (spacing_x * i),
+            offset_y + y * scale,
+            FRAME_WIDTH * scale,
+            FRAME_HEIGHT * scale
+        };
+
+        DrawTexturePro(
+            tex,
+            spr[i + KEY_COUNT * anim_phase[i]],
+            dest,
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+    }
+
+    y = FRAME_HEIGHT + spacing_y;
+    rw = FRAME_WIDTH * r2 * scale + (r2 * spacing_x);
+    for (i = 1; i < r2 + 1; ++i) {
+        x = FRAME_WIDTH * (i - 1);
+        x = ((GetScreenWidth() - rw) / 2) + (x * scale);
+
+        dest = (Rectangle) {
+            x + (spacing_x * i),
+            offset_y + y * scale,
+            FRAME_WIDTH * scale,
+            FRAME_HEIGHT * scale
+        };
+
+        DrawTexturePro(
+            tex,
+            spr[i + r2 + KEY_COUNT * anim_phase[i + r2]],
+            dest,
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+    }
+
+    y = FRAME_HEIGHT * 2 + spacing_y * 2;
+    rw = FRAME_WIDTH * r3 * scale + (r3 * spacing_x);
+    for (i = 0; i < r3; ++i) {
+        x = FRAME_WIDTH  * i;
+        x = ((GetScreenWidth() - rw) / 2) + (x * scale);
+
+        dest = (Rectangle) {
+            x + (spacing_x * i),
+            offset_y + y * scale,
+            FRAME_WIDTH * scale,
+            FRAME_HEIGHT * scale
+        };
+
+        DrawTexturePro(
+            tex,
+            // spr[i + r3 + KEY_COUNT * anim_phase[i + r3]],
+            spr[i + r1 + r2 + KEY_COUNT * anim_phase[i + r1 + r2]],
+            dest,
+            (Vector2) { 0, 0 },
+            0.0f,
+            WHITE
+        );
+    }
+}
+
+int _get_key_spr_index(int unicode_key)
+{
+    switch (unicode_key) {
+        // й Й
+        case 0x0419: case 0x0439:
+            return 0;
+        // ц Ц
+        case 0x0426: case 0x0446:
+            return 1;
+        // у У
+        case 0x0423: case 0x0443:
+            return 2;
+        // к К
+        case 0x041a: case 0x043a:
+            return 3;
+        // е Е
+        case 0x0415: case 0x0435:
+            return 4;
+        // н Н
+        case 0x043d: case 0x041d:
+            return 5;
+        // г Г
+        case 0x0413: case 0x0433:
+            return 6;
+        // ш Ш
+        case 0x0448: case 0x0428:
+            return 7;
+        // щ Щ
+        case 0x0429: case 0x0449:
+            return 8;
+        // з З
+        case 0x0417: case 0x0437:
+            return 9;
+        // х Х
+        case 0x0445: case 0x0425:
+            return 10;
+        // ъ Ъ
+        case 0x042a: case 0x044a:
+            return 11;
+        // ф Ф
+        case 0x0444: case 0x0424:
+            return 12;
+        // ы Ы
+        case 0x044b: case 0x042b:
+            return 13;
+        // в В
+        case 0x0432: case 0x0412:
+            return 14;
+        // а А
+        case 0x0410: case 0x0430:
+            return 15;
+        // п П
+        case 0x043f: case 0x041f:
+            return 16;
+        // р Р
+        case 0x0420: case 0x0440:
+            return 17;
+        // о О
+        case 0x041e: case 0x043e:
+            return 18;
+        // л Л
+        case 0x041b: case 0x043b:
+            return 19;
+        // д Д
+        case 0x0434: case 0x0414:
+            return 20;
+        // ж Ж
+        case 0x0416: case 0x0436:
+            return 21;
+        // э Э
+        case 0x044d: case 0x042d:
+            return 22;
+        // я Я
+        case 0x042f: case 0x044f:
+            return 23;
+        // ч Ч
+        case 0x0427: case 0x0447:
+            return 24;
+        // с С
+        case 0x0441: case 0x0421:
+            return 25;
+        // м М
+        case 0x043c: case 0x041c:
+            return 26;
+        // и И
+        case 0x0418: case 0x0438:
+            return 27;
+        // т Т
+        case 0x0442: case 0x0422:
+            return 28;
+        // ь Ь
+        case 0x042c: case 0x044c:
+            return 29;
+        case 0x0431: case 0x0411:
+            return 30;
+        // ю Ю
+        case 0x044e: case 0x042e:
+            return 31;
+        // ё Ë
+        case 0x0451: case 0x0401:
+            TraceLog(LOG_ERROR, "Draw the freaking ё Ë sprite!");
+            return -1;
+        default:
+            return -1;
+    }
+}
+
