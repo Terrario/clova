@@ -107,7 +107,7 @@ void w_keyboard_draw(void)
             dest,
             (Vector2) { 0, 0 },
             0.0f,
-            WHITE
+            anim_phase[i] > 0 ? YELLOW : WHITE
         );
     }
 
@@ -130,7 +130,7 @@ void w_keyboard_draw(void)
             dest,
             (Vector2) { 0, 0 },
             0.0f,
-            WHITE
+            anim_phase[i + r2] > 0 ? YELLOW : WHITE
         );
     }
 
@@ -149,12 +149,11 @@ void w_keyboard_draw(void)
 
         DrawTexturePro(
             tex,
-            // spr[i + r3 + KEY_COUNT * anim_phase[i + r3]],
             spr[i + r1 + r2 + KEY_COUNT * anim_phase[i + r1 + r2]],
             dest,
             (Vector2) { 0, 0 },
             0.0f,
-            WHITE
+            anim_phase[i + r1 + r2] > 0 ? YELLOW : WHITE
         );
     }
 }
