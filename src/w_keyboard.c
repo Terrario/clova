@@ -1,7 +1,9 @@
 #include "raylib.h"
 #include <stdint.h>
 
+#include "globals.h"
 #include "w_keyboard.h"
+#include "w_stage.h"
 
 #define KEY_COUNT    32
 #define FRAME_WIDTH  14
@@ -49,7 +51,7 @@ void w_keyboard_update(void)
 
     key = GetCharPressed();
     if (key > 0) {
-        // TODO: convert key to UTF-8 codepoints and append to "buff" global
+        w_stage_buff_push(key);
         key_index = _get_key_spr_index(key);
         if (key_index >= 0) {
             anim_acc[key_index] = 0.0f;
@@ -69,6 +71,10 @@ void w_keyboard_update(void)
             }
         }
     }
+
+    if (IsKeyPressed(KEY_BACKSPACE)) {
+        w_stage_buff_pop();
+    }
 }
 
 void w_keyboard_draw(void)
@@ -79,26 +85,25 @@ void w_keyboard_draw(void)
         , r1 = 12
         , r2 = 11
         , r3 = 9
-        , scale = GetScreenWidth() * 0.0055f
         , spacing_x = 5
         , spacing_y = 4;
     uint16_t
         x
         , y = 0
         , rw
-        , offset_y = (GetScreenHeight() / 2) + (FRAME_HEIGHT * scale);
+        , offset_y = (GetScreenHeight() / 2) + (FRAME_HEIGHT * SCALE);
 
     y = 0;
-    rw = FRAME_WIDTH * r1 * scale + (r1 * spacing_x);
+    rw = FRAME_WIDTH * r1 * SCALE + (r1 * spacing_x);
     for (i = 0; i < r1; ++i) {
         x = FRAME_WIDTH * i;
-        x = ((GetScreenWidth() - rw) / 2) + (x * scale);
+        x = ((GetScreenWidth() - rw) / 2) + (x * SCALE);
 
         dest = (Rectangle) {
             x + (spacing_x * i),
-            offset_y + y * scale,
-            FRAME_WIDTH * scale,
-            FRAME_HEIGHT * scale
+            offset_y + y * SCALE,
+            FRAME_WIDTH * SCALE,
+            FRAME_HEIGHT * SCALE
         };
 
         DrawTexturePro(
@@ -112,16 +117,16 @@ void w_keyboard_draw(void)
     }
 
     y = FRAME_HEIGHT + spacing_y;
-    rw = FRAME_WIDTH * r2 * scale + (r2 * spacing_x);
+    rw = FRAME_WIDTH * r2 * SCALE + (r2 * spacing_x);
     for (i = 1; i < r2 + 1; ++i) {
         x = FRAME_WIDTH * (i - 1);
-        x = ((GetScreenWidth() - rw) / 2) + (x * scale);
+        x = ((GetScreenWidth() - rw) / 2) + (x * SCALE);
 
         dest = (Rectangle) {
             x + (spacing_x * i),
-            offset_y + y * scale,
-            FRAME_WIDTH * scale,
-            FRAME_HEIGHT * scale
+            offset_y + y * SCALE,
+            FRAME_WIDTH * SCALE,
+            FRAME_HEIGHT * SCALE
         };
 
         DrawTexturePro(
@@ -135,16 +140,16 @@ void w_keyboard_draw(void)
     }
 
     y = FRAME_HEIGHT * 2 + spacing_y * 2;
-    rw = FRAME_WIDTH * r3 * scale + (r3 * spacing_x);
+    rw = FRAME_WIDTH * r3 * SCALE + (r3 * spacing_x);
     for (i = 0; i < r3; ++i) {
         x = FRAME_WIDTH  * i;
-        x = ((GetScreenWidth() - rw) / 2) + (x * scale);
+        x = ((GetScreenWidth() - rw) / 2) + (x * SCALE);
 
         dest = (Rectangle) {
             x + (spacing_x * i),
-            offset_y + y * scale,
-            FRAME_WIDTH * scale,
-            FRAME_HEIGHT * scale
+            offset_y + y * SCALE,
+            FRAME_WIDTH * SCALE,
+            FRAME_HEIGHT * SCALE
         };
 
         DrawTexturePro(

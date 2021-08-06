@@ -1,7 +1,15 @@
 #ifndef globals_h
 #define globals_h
 
-extern char buff[1024] = { 0 };
+#include "raylib.h"
+
+#define GAME_WIDTH  800 * 1.5
+#define GAME_HEIGHT 600 * 1.5
+#define SCALE       GAME_WIDTH * 0.0055f
+#define BUFF_SIZE   1024
+
+extern char buff[BUFF_SIZE];
+extern Font font;
 
 #endif
 
