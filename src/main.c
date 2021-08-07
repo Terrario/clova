@@ -11,6 +11,8 @@ int main(void)
 {
     InitWindow(GAME_WIDTH, GAME_HEIGHT, "Clova");
     SetTargetFPS(60);
+    InitAudioDevice();
+
     font = LoadFont("assets/fonts/dejavu.fnt");
 
     w_keyboard_init();
@@ -31,6 +33,7 @@ int main(void)
         EndDrawing();
     }
     UnloadFont(font);
+    CloseAudioDevice();
     CloseWindow();
 
     return 0;

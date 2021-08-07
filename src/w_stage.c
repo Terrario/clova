@@ -8,11 +8,20 @@
 const char *sentence;
 uint16_t buff_cursor = 0;
 
+Sound
+    typing_positive_feedback
+    , typing_negative_feedback
+    , positive_feedback;
+
 void _next_random_sentence(void);
 
 void w_stage_init(void)
 {
     _next_random_sentence();
+
+    typing_positive_feedback = LoadSound("assets/sfx/electric/whoosh.wav");
+    typing_negative_feedback = LoadSound("assets/sfx/electric/uielec01.wav");
+    positive_feedback = LoadSound("assets/sfx/electric/enginestart.wav");
 }
 
 void w_stage_update(void)
@@ -35,6 +44,8 @@ void w_stage_update(void)
         buff[i] = 0;
     }
     buff_cursor = 0;
+
+    PlaySound(positive_feedback);
 }
 
 void w_stage_draw(void)
@@ -100,7 +111,13 @@ bool w_stage_key_matches_sentence(int key)
 
     sentence_key = GetNextCodepoint(&sentence[buff_cursor], &sentence_char_length);
 
-    return sentence_key == key;
+    if (sentence_key == key) {
+        PlaySound(typing_positive_feedback);
+        return true;
+    }
+
+    PlaySound(typing_negative_feedback);
+    return false;
 }
 
 void w_stage_buff_push(int key)

@@ -71,10 +71,6 @@ void w_keyboard_update(void)
             }
         }
     }
-
-    if (IsKeyPressed(KEY_BACKSPACE)) {
-        w_stage_buff_pop();
-    }
 }
 
 void w_keyboard_draw(void)
