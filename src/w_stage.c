@@ -26,36 +26,32 @@ bool w_stage_key_matches_sentence(int key)
 void w_stage_buff_push(int key)
 {
     const char *unicode_char;
+    uint16_t i;
     int len;
 
-    // Convert key into codepoint
     unicode_char = CodepointToUtf8(key, &len);
-
-    // Append to buffer
-    strcpy(&buff[buff_cursor], unicode_char);
-
-    // Move buffer cursor
-    buff_cursor += len;
+    for (i = 0; i < len; ++i) {
+        buff[buff_cursor++] = unicode_char[i];
+    }
 }
 
 void w_stage_buff_pop(void)
 {
-    uint8_t chars;
-    uint16_t i;
-    int len;
-
     if (buff_cursor == 0) {
         return;
     }
 
-    chars = GetCodepointsCount(buff);
-    for (i = 0; i < chars; ++i) {
-        GetNextCodepoint(buff, &len);
-    }
+    uint16_t i;
+    int
+        *codepoints
+        , codepoint_count
+        , len;
 
-    buff_cursor -= len;
+    codepoints = GetCodepoints(buff, &codepoint_count);
+    CodepointToUtf8(codepoints[codepoint_count -1], &len);
+
     for (i = 0; i < len; ++i) {
-        buff[buff_cursor + i] = 0;
+        buff[--buff_cursor] = 0;
     }
 }
 
