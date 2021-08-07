@@ -12,6 +12,17 @@ void w_stage_init(void)
 {
 }
 
+bool w_stage_key_matches_sentence(int key)
+{
+    int
+        sentence_key
+        , sentence_char_length;
+
+    sentence_key = GetNextCodepoint(&sentence[buff_cursor], &sentence_char_length);
+
+    return sentence_key == key;
+}
+
 void w_stage_buff_push(int key)
 {
     const char *unicode_char;

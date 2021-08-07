@@ -50,7 +50,7 @@ void w_keyboard_update(void)
     int key;
 
     key = GetCharPressed();
-    if (key > 0) {
+    if (key > 0 && w_stage_key_matches_sentence(key)) {
         w_stage_buff_push(key);
         key_index = _get_key_spr_index(key);
         if (key_index >= 0) {
