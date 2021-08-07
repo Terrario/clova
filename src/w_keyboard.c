@@ -12,6 +12,12 @@
 Texture2D tex;
 Rectangle spr[KEY_COUNT * 3] = { 0 };
 
+enum KeyAnimationType {
+    ANIM_NORMAL = 0
+    , ANIM_NEGATIVE
+};
+
+uint8_t anim_type[KEY_COUNT] = { ANIM_NORMAL };
 uint8_t anim_phase[KEY_COUNT] = { 0 };
 float anim_acc[KEY_COUNT] = { 0.0f };
 
@@ -46,16 +52,22 @@ void w_keyboard_init(void)
 
 void w_keyboard_update(void)
 {
+    bool match;
     uint8_t i, key_index;
     int key;
 
     key = GetCharPressed();
-    if (key > 0 && w_stage_key_matches_sentence(key)) {
-        w_stage_buff_push(key);
+    if (key > 0) {
+        match = w_stage_key_matches_sentence(key);
+        if (match) {
+            w_stage_buff_push(key);
+        }
+
         key_index = _get_key_spr_index(key);
-        if (key_index >= 0) {
+        if (key_index >= 0 && key_index < KEY_COUNT) {
             anim_acc[key_index] = 0.0f;
             anim_phase[key_index] = 1;
+            anim_type[key_index] = match ? ANIM_NORMAL : ANIM_NEGATIVE;
         }
     }
 
@@ -76,6 +88,7 @@ void w_keyboard_update(void)
 void w_keyboard_draw(void)
 {
     Rectangle dest;
+    Color tint;
     uint8_t
         i
         , r1 = 12
@@ -102,13 +115,22 @@ void w_keyboard_draw(void)
             FRAME_HEIGHT * SCALE
         };
 
+        tint = WHITE;
+        if (anim_phase[i] > 0) {
+            tint = GREEN;
+
+            if (anim_type[i] == ANIM_NEGATIVE) {
+                tint = PINK;
+            }
+        }
+
         DrawTexturePro(
             tex,
             spr[i + KEY_COUNT * anim_phase[i]],
             dest,
             (Vector2) { 0, 0 },
             0.0f,
-            anim_phase[i] > 0 ? YELLOW : WHITE
+            tint
         );
     }
 
@@ -125,13 +147,22 @@ void w_keyboard_draw(void)
             FRAME_HEIGHT * SCALE
         };
 
+        tint = WHITE;
+        if (anim_phase[i + r2] > 0) {
+            tint = GREEN;
+
+            if (anim_type[i] == ANIM_NEGATIVE) {
+                tint = PINK;
+            }
+        }
+
         DrawTexturePro(
             tex,
             spr[i + r2 + KEY_COUNT * anim_phase[i + r2]],
             dest,
             (Vector2) { 0, 0 },
             0.0f,
-            anim_phase[i + r2] > 0 ? YELLOW : WHITE
+            tint
         );
     }
 
@@ -148,13 +179,22 @@ void w_keyboard_draw(void)
             FRAME_HEIGHT * SCALE
         };
 
+        tint = WHITE;
+        if (anim_phase[i + r1 + r2] > 0) {
+            tint = GREEN;
+
+            if (anim_type[i] == ANIM_NEGATIVE) {
+                tint = PINK;
+            }
+        }
+
         DrawTexturePro(
             tex,
             spr[i + r1 + r2 + KEY_COUNT * anim_phase[i + r1 + r2]],
             dest,
             (Vector2) { 0, 0 },
             0.0f,
-            anim_phase[i + r1 + r2] > 0 ? YELLOW : WHITE
+            tint
         );
     }
 }
