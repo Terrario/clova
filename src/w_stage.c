@@ -5,57 +5,36 @@
 #include "globals.h"
 #include "w_stage.h"
 
+const char *sentence;
 uint16_t buff_cursor = 0;
+
+void _next_random_sentence(void);
 
 void w_stage_init(void)
 {
-}
-
-bool w_stage_key_matches_sentence(int key)
-{
-    int
-        sentence_key
-        , sentence_char_length;
-
-    sentence_key = GetNextCodepoint(&sentence[buff_cursor], &sentence_char_length);
-
-    return sentence_key == key;
-}
-
-void w_stage_buff_push(int key)
-{
-    const char *unicode_char;
-    uint16_t i;
-    int len;
-
-    unicode_char = CodepointToUtf8(key, &len);
-    for (i = 0; i < len; ++i) {
-        buff[buff_cursor++] = unicode_char[i];
-    }
-}
-
-void w_stage_buff_pop(void)
-{
-    if (buff_cursor == 0) {
-        return;
-    }
-
-    uint16_t i;
-    int
-        *codepoints
-        , codepoint_count
-        , len;
-
-    codepoints = GetCodepoints(buff, &codepoint_count);
-    CodepointToUtf8(codepoints[codepoint_count -1], &len);
-
-    for (i = 0; i < len; ++i) {
-        buff[--buff_cursor] = 0;
-    }
+    _next_random_sentence();
 }
 
 void w_stage_update(void)
 {
+    int
+        i
+        , buff_len
+        , sentence_len;
+
+    GetCodepoints(buff, &buff_len);
+    GetCodepoints(sentence, &sentence_len);
+
+    // Strings aren't same size, exit
+    if (buff_len != sentence_len) {
+        return;
+    }
+
+    _next_random_sentence();
+    for (i = 0; i < buff_cursor; ++i) {
+        buff[i] = 0;
+    }
+    buff_cursor = 0;
 }
 
 void w_stage_draw(void)
@@ -111,5 +90,54 @@ void w_stage_draw(void)
         1 * SCALE,
         DARKBLUE
     );
+}
+
+bool w_stage_key_matches_sentence(int key)
+{
+    int
+        sentence_key
+        , sentence_char_length;
+
+    sentence_key = GetNextCodepoint(&sentence[buff_cursor], &sentence_char_length);
+
+    return sentence_key == key;
+}
+
+void w_stage_buff_push(int key)
+{
+    const char *unicode_char;
+    uint16_t i;
+    int len;
+
+    unicode_char = CodepointToUtf8(key, &len);
+    for (i = 0; i < len; ++i) {
+        buff[buff_cursor++] = unicode_char[i];
+    }
+}
+
+void w_stage_buff_pop(void)
+{
+    if (buff_cursor == 0) {
+        return;
+    }
+
+    uint16_t i;
+    int
+        *codepoints
+        , codepoint_count
+        , len;
+
+    codepoints = GetCodepoints(buff, &codepoint_count);
+    CodepointToUtf8(codepoints[codepoint_count -1], &len);
+
+    for (i = 0; i < len; ++i) {
+        buff[--buff_cursor] = 0;
+    }
+}
+
+void _next_random_sentence(void)
+{
+    // TODO: Get a random sentence
+    sentence = "мудрые слова!";
 }
 

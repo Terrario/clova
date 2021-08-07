@@ -4,14 +4,11 @@
 #include "w_keyboard.h"
 #include "w_stage.h"
 
-const char *sentence;
 char buff[BUFF_SIZE] = { 0 };
 Font font;
 
 int main(void)
 {
-    sentence = "мудрые слова!";
-
     InitWindow(GAME_WIDTH, GAME_HEIGHT, "Clova");
     SetTargetFPS(60);
     font = LoadFont("assets/fonts/dejavu.fnt");
