@@ -4,7 +4,6 @@
 
 #include "globals.h"
 #include "w_stage.h"
-#include "w_word.h"
 
 uint16_t buff_cursor = 0;
 
