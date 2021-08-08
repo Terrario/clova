@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <string.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "globals.h"
@@ -103,13 +104,18 @@ void w_stage_draw(void)
     );
 }
 
-bool w_stage_key_matches_sentence(int key)
+int w_stage_key_current(void)
 {
     int
         sentence_key
         , sentence_char_length;
 
-    sentence_key = GetNextCodepoint(&sentence[buff_cursor], &sentence_char_length);
+    return GetNextCodepoint(&sentence[buff_cursor], &sentence_char_length);
+}
+
+bool w_stage_key_matches_sentence(int key)
+{
+    int sentence_key = w_stage_key_current();
 
     if (sentence_key == key) {
         PlaySound(typing_positive_feedback);

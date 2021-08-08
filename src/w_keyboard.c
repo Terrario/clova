@@ -101,6 +101,7 @@ void w_keyboard_draw(void)
         , y = 0
         , rw
         , offset_y = (GetScreenHeight() / 2) + (FRAME_HEIGHT * SCALE);
+    int highlight_key = w_stage_key_current();
 
     y = 0;
     rw = FRAME_WIDTH * r1 * SCALE + (r1 * spacing_x);
@@ -122,6 +123,11 @@ void w_keyboard_draw(void)
             if (anim_type[i] == ANIM_NEGATIVE) {
                 tint = PINK;
             }
+        }
+
+        if (hint_mode && _get_key_spr_index(highlight_key) == i) {
+            // TODO: use a crosshair instead
+            DrawRectangleLinesEx(dest, 2, YELLOW);
         }
 
         DrawTexturePro(
@@ -151,9 +157,14 @@ void w_keyboard_draw(void)
         if (anim_phase[i + r2] > 0) {
             tint = GREEN;
 
-            if (anim_type[i] == ANIM_NEGATIVE) {
+            if (anim_type[i + r2] == ANIM_NEGATIVE) {
                 tint = PINK;
             }
+        }
+
+        if (hint_mode && _get_key_spr_index(highlight_key) == i + r2) {
+            // TODO: use a crosshair instead
+            DrawRectangleLinesEx(dest, 2, YELLOW);
         }
 
         DrawTexturePro(
@@ -183,9 +194,14 @@ void w_keyboard_draw(void)
         if (anim_phase[i + r1 + r2] > 0) {
             tint = GREEN;
 
-            if (anim_type[i] == ANIM_NEGATIVE) {
+            if (anim_type[i + r1 + r2] == ANIM_NEGATIVE) {
                 tint = PINK;
             }
+        }
+
+        if (hint_mode && _get_key_spr_index(highlight_key) == i + r1 + r2) {
+            // TODO: use a crosshair instead
+            DrawRectangleLinesEx(dest, 2, YELLOW);
         }
 
         DrawTexturePro(

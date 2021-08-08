@@ -4,6 +4,7 @@
 #include "w_keyboard.h"
 #include "w_stage.h"
 
+bool hint_mode = true;
 char buff[BUFF_SIZE] = { 0 };
 Font font;
 
