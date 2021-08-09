@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include <sqlite3.h>
 
 #include "globals.h"
 #include "w_keyboard.h"
@@ -7,9 +8,17 @@
 bool hint_mode = true;
 char buff[BUFF_SIZE] = { 0 };
 Font font;
+sqlite3 *db;
 
 int main(void)
 {
+    int db_rc;
+    sqlite3_open("assets/db.sqlite3", &db);
+    if (sqlite3_open("assets/db.sqlite3", &db)) {
+        sqlite3_close(db);
+        TraceLog(LOG_ERROR, "Could not open sqlite3 db: assets/db.sqlite3");
+    }
+
     InitWindow(GAME_WIDTH, GAME_HEIGHT, "Clova");
     SetTargetFPS(60);
     InitAudioDevice();
@@ -33,9 +42,11 @@ int main(void)
             DrawFPS(0, 0);
         EndDrawing();
     }
+
     UnloadFont(font);
     CloseAudioDevice();
     CloseWindow();
+    sqlite3_close(db);
 
     return 0;
 }

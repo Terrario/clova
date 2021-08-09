@@ -1,4 +1,6 @@
 #include "raylib.h"
+#include <stdlib.h>
+#include <sqlite3.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -6,7 +8,7 @@
 #include "globals.h"
 #include "w_stage.h"
 
-const char *sentence;
+char *sentence;
 uint16_t buff_cursor = 0;
 
 Sound
@@ -158,9 +160,38 @@ void w_stage_buff_pop(void)
     }
 }
 
+int _random_sentence_callback(void *data, int argc, char **argv, char **col_name)
+{
+    uint16_t str_size = 0;
+
+    int i
+        , *codepoints
+        , codepoints_count
+        , bytes_length;
+
+    codepoints = GetCodepoints(argv[1], &codepoints_count);
+    for (i = 0; i < codepoints_count; ++i) {
+        CodepointToUtf8(codepoints[i], &bytes_length);
+        str_size += bytes_length;
+    }
+
+    sentence = realloc(sentence, str_size + 1);
+    strcpy(sentence, argv[1]);
+
+    return 0;
+}
+
 void _next_random_sentence(void)
 {
-    // TODO: Get a random sentence
-    sentence = "мудрые слова!";
+    const char *sql = "select t.sentence_id, t.content, t.translated_content from translation t inner join sentence_audio sa on sa.sentence_id = t.sentence_id where sa.license is not null order by random() limit 1;";
+    int rc;
+    char *error_message = 0;
+    const char *data = "";
+
+    rc = sqlite3_exec(db, sql, _random_sentence_callback, (void*) data, &error_message);
+    if (rc != SQLITE_OK) {
+        sqlite3_free(error_message);
+        TraceLog(LOG_ERROR, "DB Error: Could not get next random sentence.");
+    }
 }
 
