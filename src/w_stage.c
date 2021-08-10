@@ -36,6 +36,17 @@ void w_stage_update(void)
         , buff_len
         , sentence_len;
 
+    // replay sentence audio
+    if (IsKeyDown(KEY_LEFT_SUPER)) {
+        if (IsKeyPressed(KEY_P)) {
+            PlaySound(sentence_audio);
+        }
+
+        if (IsKeyPressed(KEY_N)) {
+            _next_random_sentence();
+        }
+    }
+
     GetCodepoints(buff, &buff_len);
     GetCodepoints(sentence, &sentence_len);
 
