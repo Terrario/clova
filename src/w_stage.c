@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <sqlite3.h>
 #include <string.h>
 #include <stdbool.h>
@@ -14,7 +15,8 @@ uint16_t buff_cursor = 0;
 Sound
     typing_positive_feedback
     , typing_negative_feedback
-    , positive_feedback;
+    , positive_feedback
+    , sentence_audio = { 0 };
 
 void _next_random_sentence(void);
 
@@ -163,11 +165,21 @@ void w_stage_buff_pop(void)
 int _random_sentence_callback(void *data, int argc, char **argv, char **col_name)
 {
     uint16_t str_size = 0;
+    char *filename;
 
     int i
         , *codepoints
         , codepoints_count
         , bytes_length;
+
+    if (sentence_audio.stream.buffer != NULL) {
+        UnloadSound(sentence_audio);
+    }
+
+    filename = malloc(strlen("assets/audio/") + strlen(argv[0]) + strlen(".mp3"));
+    sprintf(filename, "assets/audio/%s.mp3", argv[0]);
+    sentence_audio = LoadSound(filename);
+    free(filename);
 
     codepoints = GetCodepoints(argv[1], &codepoints_count);
     for (i = 0; i < codepoints_count; ++i) {
@@ -193,5 +205,7 @@ void _next_random_sentence(void)
         sqlite3_free(error_message);
         TraceLog(LOG_ERROR, "DB Error: Could not get next random sentence.");
     }
+
+    PlaySound(sentence_audio);
 }
 
