@@ -71,9 +71,14 @@ void w_stage_draw(void)
         , spacing = 1.0f * SCALE
         , offset_x
         , offset_y;
+    uint8_t i = 15;
     Vector2 sentence_size;
 
     sentence_size = MeasureTextEx(font, sentence, font_size, spacing);
+    while (sentence_size.x > GetScreenWidth() * .8f) {
+        font_size = i-- * SCALE;
+        sentence_size = MeasureTextEx(font, sentence, font_size, spacing);
+    }
 
     offset_x = GetScreenWidth() / 2 - sentence_size.x / 2;
     offset_y = GetScreenHeight() / 2 - sentence_size.y / 2;
