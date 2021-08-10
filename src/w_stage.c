@@ -10,6 +10,7 @@
 #include "w_stage.h"
 
 char *sentence;
+char *sentence_translated;
 uint16_t buff_cursor = 0;
 
 Sound
@@ -81,7 +82,7 @@ void w_stage_draw(void)
     }
 
     offset_x = GetScreenWidth() / 2 - sentence_size.x / 2;
-    offset_y = GetScreenHeight() / 2 - sentence_size.y / 2;
+    offset_y = GetScreenHeight() / 2 - sentence_size.y * 2;
 
     DrawTextEx(
         font,
@@ -122,6 +123,29 @@ void w_stage_draw(void)
         1 * SCALE,
         DARKBLUE
     );
+
+    // Translated text
+    font_size -= 2 * SCALE / 2;
+    spacing = 1.0f * SCALE / 2;
+    sentence_size = MeasureTextEx(font, sentence_translated, font_size, spacing);
+    i = 15;
+    while (sentence_size.x > GetScreenWidth() * .8f) {
+        font_size = i-- * SCALE / 2;
+        sentence_size = MeasureTextEx(font, sentence, font_size, spacing);
+    }
+
+    offset_x = GetScreenWidth() / 2 - sentence_size.x / 2;
+    offset_y = GetScreenHeight() / 2 - sentence_size.y / 2;
+
+    DrawTextEx(
+        font,
+        sentence_translated,
+        (Vector2) { offset_x, offset_y },
+        font_size,
+        spacing,
+        WHITE
+    );
+
 }
 
 int w_stage_key_current(void)
@@ -205,6 +229,9 @@ int _random_sentence_callback(void *data, int argc, char **argv, char **col_name
 
     sentence = realloc(sentence, str_size + 1);
     strcpy(sentence, argv[1]);
+
+    sentence_translated = realloc(sentence_translated, strlen(argv[2])+ 2);
+    sprintf(sentence_translated, "(%s)", argv[2]);
 
     return 0;
 }
